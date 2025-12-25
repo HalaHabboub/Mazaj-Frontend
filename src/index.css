@@ -11,3 +11,26 @@
     @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-white;
   }
 }
+
+@layer components {
+
+  /* This makes the class available EVERYWHERE in your app */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-panel-hover {
+    transition: all 0.3s ease;
+  }
+
+  .glass-panel-hover:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(54, 226, 123, 0.3);
+    /* Primary Green */
+    box-shadow: 0 0 20px rgba(54, 226, 123, 0.1);
+  }
+}

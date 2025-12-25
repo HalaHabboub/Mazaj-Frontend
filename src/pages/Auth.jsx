@@ -33,6 +33,7 @@ const Auth = () => {
         navigate('/home'); // Temporary redirect for demo
     };
 
+
     return (
         <div className="auth-container">
             {/* Background Blobs (Optional: reused from Landing for consistency) */}
