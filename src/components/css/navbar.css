@@ -1,0 +1,90 @@
+/* src/components/css/Navbar.css */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 50;
+    padding: 1.5rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.navbar-container {
+    max-width: 80rem;
+    /* matches max-w-7xl */
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Glass effect for the container or sticking (optional) */
+.navbar.scrolled {
+    background: rgba(9, 9, 11, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.025em;
+}
+
+.nav-logo span {
+    font-size: 1.8rem;
+    /* The icon size */
+    color: #36e27b;
+    /* Primary Green */
+}
+
+/* Button Styles */
+.nav-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Primary Button (Login/Exit) */
+.nav-btn-primary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Danger Button (Exit Party) */
+.nav-btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    /* Red tint */
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.nav-btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Text only (Welcome message) */
+.nav-text {
+    color: #a1a1aa;
+    /* Zinc-400 */
+    font-size: 0.9rem;
+    font-weight: 500;
+}
