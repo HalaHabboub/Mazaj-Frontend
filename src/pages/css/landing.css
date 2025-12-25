@@ -1,0 +1,10 @@
+.glass-panel {
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel:hover {
+    border-color: rgba(54, 226, 123, 0.3);
+}
