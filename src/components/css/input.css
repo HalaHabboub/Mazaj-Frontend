@@ -1,0 +1,41 @@
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    text-align: left;
+}
+
+.input-label {
+    color: #a1a1aa;
+    /* Zinc 400 */
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-left: 0.25rem;
+}
+
+.input-field {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    /* Matches your rounded-xl theme */
+    padding: 0.75rem 1rem;
+    color: white;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.input-field::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.input-field:focus {
+    border-color: #36e27b;
+    /* Primary Green */
+    background: rgba(54, 226, 123, 0.05);
+    /* Very faint green tint */
+    box-shadow: 0 0 0 4px rgba(54, 226, 123, 0.1);
+}
