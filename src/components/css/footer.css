@@ -1,0 +1,52 @@
+.footer {
+    width: 100%;
+    padding: 2rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    /* Subtle top line */
+    background: rgba(9, 9, 11, 0.5);
+    /* Semi-transparent background */
+    text-align: center;
+    margin-top: auto;
+    /* Pushes footer to bottom if page content is short */
+}
+
+.footer-container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-brand {
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.025em;
+}
+
+.footer-moto {
+    color: #a1a1aa;
+    /* Zinc-400 */
+    font-size: 0.875rem;
+}
+
+.footer-copyright {
+    color: #52525b;
+    /* Zinc-600 */
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.footer-link {
+    color: #36e27b;
+    /* Primary Green */
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.footer-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
