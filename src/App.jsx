@@ -29,7 +29,7 @@ function App() {
             <Route path="/home" element={<Dashboard />} /> {/* /home */}
 
             {/* Party Pages */}
-            <Route path="/party/create" element={<CreateParty />} /> {/* /party/create */}
+            <Route path="/create" element={<CreateParty />} /> {/* /party/create */}
 
             {/* Dynamic Route: The ":id" lets you have infinite party rooms like /party/MZ-8821 */}
             <Route path="/party/:id" element={<PartyRoom />} />

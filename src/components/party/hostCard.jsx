@@ -6,7 +6,7 @@ const HostCard = () => {
 
     return (
         <div
-            onClick={() => navigate('/party/create')}
+            onClick={() => navigate('/create')}
             className="group relative glass-panel rounded-3xl overflow-hidden p-8 flex flex-col justify-between h-[340px] glass-panel-hover cursor-pointer"
         >
             {/* Big fading icon bg */}
