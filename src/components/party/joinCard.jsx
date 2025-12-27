@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 1. Import hook
 
 const JoinCard = () => {
     const [code, setCode] = useState('');
+    const navigate = useNavigate(); // 2. Initialize hook
 
     const handleJoin = () => {
-        // TODO: Add join logic later
-        console.log("Joining party:", code);
+        if (code.trim()) {
+            // 3. Navigate to the dynamic route
+            navigate(`/party/${code}`);
+        }
+    };
+
+    // Allow pressing "Enter" key
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') handleJoin();
     };
 
     return (
@@ -32,6 +41,7 @@ const JoinCard = () => {
                         <input
                             value={code}
                             onChange={(e) => setCode(e.target.value)}
+                            onKeyDown={handleKeyDown} // Add Enter key support
                             className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-full text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                             placeholder="Enter Party Code..."
                             type="text"
