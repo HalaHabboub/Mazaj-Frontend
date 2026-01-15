@@ -10,7 +10,7 @@ const NowPlaying = ({ track, onNext, onPrev, hasNext, hasPrev }) => {
             <div key={track.id} className="shrink-0 relative group animate-fade-in-up">
                 <div className="size-48 md:size-64 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/5">
                     <img
-                        src={track.cover}
+                        src={track.coverUrl || 'https://via.placeholder.com/300'}
                         alt="Album Art"
                         className="w-full h-full object-cover"
                     />

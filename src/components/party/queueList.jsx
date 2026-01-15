@@ -23,8 +23,11 @@ const QueueList = ({ tracks }) => {
                         <div key={track.id} className="group flex items-center gap-4 p-3 hover:bg-white/5 rounded-2xl transition-colors cursor-pointer border border-transparent hover:border-white/5">
                             {/* Tiny Cover */}
                             <div className="relative size-14 rounded-xl overflow-hidden bg-gray-800 shrink-0">
-                                <img src={track.cover} alt="Cover" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                            </div>
+                                <img
+                                    src={track.coverUrl || 'https://via.placeholder.com/150'}
+                                    alt="Cover"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                />                            </div>
 
                             {/* Info */}
                             <div className="flex-1 min-w-0">
