@@ -40,7 +40,7 @@ const Landing = () => {
                     </p>
 
                     <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
-                        Transform your social gatherings with an intelligent music companion that listens to your guests and keeps the vibe perfect.
+                        Transform your music sharing experience with an intelligent music companion that listens to your guests and keeps the vibe perfect.
                     </p>
                 </div>
 
@@ -76,7 +76,7 @@ const Landing = () => {
                         </span>
                     </Button>
 
-                    <p className="text-slate-500 text-sm">No credit card required • Free trial available</p>
+                    <p className="text-slate-500 text-sm">No payment required • Available for free</p>
                 </div>
 
             </main>
