@@ -1,8 +1,9 @@
 // src/components/party/nowPlaying.jsx
 import React, { useState, useRef } from 'react';
 import YouTube from 'react-youtube';
+import { API_URL } from '../../config/api';
 
-const NowPlaying = ({ track, onNext, onPrev, hasNext, hasPrev }) => {
+const NowPlaying = ({ track, onNext, onPrev, hasNext, hasPrev, partyId }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -41,10 +42,11 @@ const NowPlaying = ({ track, onNext, onPrev, hasNext, hasPrev }) => {
             setIsPlaying(false);
             clearInterval(playerRef.current?.progressInterval);
         } else if (event.data === 0) {
-            // Video ended - go to next track
+            // Video ended - just call onNext, it handles status
             clearInterval(playerRef.current?.progressInterval);
-            if (hasNext) onNext();
+            onNext();
         }
+
     };
 
     // Play/Pause toggle

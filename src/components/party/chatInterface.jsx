@@ -19,43 +19,40 @@ const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    // Fetch chat history on mount
+    // Add this useEffect for polling (after the fetchHistory useEffect)
     useEffect(() => {
-        const fetchHistory = async () => {
+        // Poll for new messages every 5 seconds
+        const interval = setInterval(async () => {
             try {
                 const response = await fetch(`${API_URL}/chat/${partyId}/history`);
                 const data = await response.json();
 
-                if (data.success && data.messages.length > 0) {
+                if (data.success && data.messages.length > messages.length) {
+                    // New messages arrived!
                     const formattedMessages = data.messages.map(msg => ({
                         id: msg.id,
                         type: msg.role === 'USER' ? 'user' :
                             msg.type === 'AI_ACCEPT' ? 'ai-accept' :
                                 msg.type === 'AI_DENY' ? 'ai-deny' : 'ai',
                         text: msg.content,
-                        user: msg.role === 'USER' ? { name: 'You', avatar: 'https://i.pravatar.cc/150?u=You' } : null
+                        user: msg.role === 'USER' ? {
+                            name: msg.senderId === user.id ? 'You' : (msg.senderName || 'Guest'),
+                            avatar: msg.senderAvatar || `https://i.pravatar.cc/150?u=${msg.senderId}`,
+                            isMe: msg.senderId === user.id
+                        } : null
                     }));
                     setMessages(formattedMessages);
-                } else {
-                    // No history - show welcome message
-                    setMessages([{
-                        id: 'welcome',
-                        type: 'ai',
-                        text: `Hey! I'm Mazaj, your AI DJ. The vibe is: "${vibeData}". Request a song or just chat!`
-                    }]);
+
+                    // Also refresh queue in case songs were added
+                    onQueueUpdate();
                 }
             } catch (error) {
-                console.error('Failed to fetch chat history:', error);
-                setMessages([{
-                    id: 'welcome',
-                    type: 'ai',
-                    text: `Hey! I'm Mazaj, your AI DJ. Request a song or just chat!`
-                }]);
+                console.error('Polling error:', error);
             }
-        };
+        }, 5000); // Every 5 seconds
 
-        fetchHistory();
-    }, [partyId, vibeData]);
+        return () => clearInterval(interval); // Cleanup on unmount
+    }, [partyId, messages.length]);
 
     // Send message to API
     const sendMessage = async (content) => {

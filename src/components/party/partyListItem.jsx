@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const PartyListItem = ({ id, title, host, time, type = 'music', attendees = [] }) => {
+const PartyListItem = ({ id, title, host, time, type = 'music', attendees = [], onDelete, canDelete }) => {
     const navigate = useNavigate();
 
     const getIcon = () => {
@@ -21,6 +21,13 @@ const PartyListItem = ({ id, title, host, time, type = 'music', attendees = [] }
         }
     };
 
+    const handleDelete = (e) => {
+        e.stopPropagation(); // Prevent navigating to party
+        if (confirm('Are you sure you want to delete this party? This cannot be undone.')) {
+            onDelete(id);
+        }
+    };
+
     return (
         <div
             onClick={handleClick}
@@ -34,8 +41,10 @@ const PartyListItem = ({ id, title, host, time, type = 'music', attendees = [] }
                 <div>
                     <h4 className="text-white font-medium text-lg">{title}</h4>
                     <div className="flex items-center gap-2 text-xs text-white/50">
-
-
+                        <span className="flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[10px]">schedule</span> {time}
+                        </span>
+                        <span>•</span>
                         <span>Hosted by {host}</span>
                     </div>
                 </div>
@@ -53,6 +62,17 @@ const PartyListItem = ({ id, title, host, time, type = 'music', attendees = [] }
                             </div>
                         )}
                     </div>
+                )}
+
+                {/* Delete Button (only for host) */}
+                {canDelete && (
+                    <button
+                        onClick={handleDelete}
+                        className="p-2 rounded-full text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        title="Delete party"
+                    >
+                        <span className="material-symbols-outlined text-xl">delete</span>
+                    </button>
                 )}
 
                 {/* Join Arrow */}
