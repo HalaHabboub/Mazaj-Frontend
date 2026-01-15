@@ -1,67 +1,123 @@
+// src/components/party/chatInterface.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import { API_URL } from '../../config/api';
 import MessageBubble from './messageBubble';
 
-const ChatInterface = ({ vibeData }) => {
+const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [messages, setMessages] = useState([]);
     const chatEndRef = useRef(null);
 
-    // 1. Initial Dummy Data
-    const [messages, setMessages] = useState([
-        { id: 1, type: 'ai', text: `I've analyzed the vibe: "${vibeData.title}". We are keeping it ${vibeData.mood}! ⚡️` },
-    ]);
-
-    // Auto-scroll to bottom when messages change
+    // Auto-scroll to bottom
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    // 2. Handle User Send
-    const handleSend = (e) => {
-        e.preventDefault();
-        if (!inputValue.trim()) return;
+    // Fetch chat history on mount
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const response = await fetch(`${API_URL}/chat/${partyId}/history`);
+                const data = await response.json();
 
-        // Add User Message
-        const newMessage = {
+                if (data.success && data.messages.length > 0) {
+                    const formattedMessages = data.messages.map(msg => ({
+                        id: msg.id,
+                        type: msg.role === 'USER' ? 'user' :
+                            msg.type === 'AI_ACCEPT' ? 'ai-accept' :
+                                msg.type === 'AI_DENY' ? 'ai-deny' : 'ai',
+                        text: msg.content,
+                        user: msg.role === 'USER' ? { name: 'You', avatar: 'https://i.pravatar.cc/150?u=You' } : null
+                    }));
+                    setMessages(formattedMessages);
+                } else {
+                    // No history - show welcome message
+                    setMessages([{
+                        id: 'welcome',
+                        type: 'ai',
+                        text: `Hey! I'm Mazaj, your AI DJ. The vibe is: "${vibeData}". Request a song or just chat!`
+                    }]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch chat history:', error);
+                setMessages([{
+                    id: 'welcome',
+                    type: 'ai',
+                    text: `Hey! I'm Mazaj, your AI DJ. Request a song or just chat!`
+                }]);
+            }
+        };
+
+        fetchHistory();
+    }, [partyId, vibeData]);
+
+    // Send message to API
+    const sendMessage = async (content) => {
+        const response = await fetch(`${API_URL}/chat/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                partyId: partyId,
+                senderId: 'user-123', // Hardcoded for now
+                content: content
+            }),
+        });
+        const data = await response.json();
+        return data;
+    };
+
+    // Handle form submit
+    const handleSend = async (e) => {
+        e.preventDefault();
+        if (!inputValue.trim() || isTyping) return;
+
+        const userText = inputValue;
+
+        // Add user message immediately
+        const userMessage = {
             id: Date.now(),
             type: 'user',
-            text: inputValue,
+            text: userText,
             user: { name: 'You', avatar: 'https://i.pravatar.cc/150?u=You' }
         };
 
-        setMessages((prev) => [...prev, newMessage]);
+        setMessages(prev => [...prev, userMessage]);
         setInputValue('');
         setIsTyping(true);
 
-        // 3. Simulate AI Reply (Mock Logic)
-        setTimeout(() => {
-            generateAIResponse(inputValue);
-        }, 1500);
-    };
+        try {
+            // Call the real API
+            const result = await sendMessage(userText);
 
-    // 4. Mock AI Logic
-    const generateAIResponse = (userText) => {
-        let aiMsg = { id: Date.now() + 1, type: 'ai', text: "I'm listening..." };
+            if (result.success) {
+                // Add AI response
+                const aiMessage = {
+                    id: result.aiResponse.id,
+                    type: result.aiResponse.type === 'AI_ACCEPT' ? 'ai-accept' :
+                        result.aiResponse.type === 'AI_DENY' ? 'ai-deny' : 'ai',
+                    text: result.aiResponse.content
+                };
+                setMessages(prev => [...prev, aiMessage]);
 
-        // Simple keyword matching for demo purposes
-        if (userText.toLowerCase().includes("sad") || userText.toLowerCase().includes("slow")) {
-            aiMsg = {
-                ...aiMsg,
-                type: 'ai-deny',
-                text: "Too sad for this vibe. Try something faster! (BPM must be > 110)"
-            };
-        } else if (userText.toLowerCase().includes("funk") || userText.toLowerCase().includes("happy")) {
-            aiMsg = {
-                ...aiMsg,
-                type: 'ai-accept',
-                text: "That works! 🔥 Adding to queue.",
-                song: { title: "Requested Track", artist: "Artist Name" }
-            };
-        } else {
-            aiMsg.text = "I'll check if that fits the vibe rules...";
+                // If song was added, refresh the queue!
+                if (result.aiResponse.type === 'AI_ACCEPT') {
+                    onQueueUpdate();
+                }
+            } else {
+                throw new Error('API returned error');
+            }
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                type: 'ai',
+                text: "Sorry, I'm having connection issues. Try again!"
+            }]);
         }
 
-        setMessages((prev) => [...prev, aiMsg]);
         setIsTyping(false);
     };
 
@@ -79,7 +135,7 @@ const ChatInterface = ({ vibeData }) => {
                     </div>
                     <div>
                         <p className="text-[10px] font-bold text-ai-accent uppercase tracking-widest leading-tight">Current Vibe</p>
-                        <p className="text-white font-bold text-sm">{vibeData.title}</p>
+                        <p className="text-white font-bold text-sm truncate max-w-[250px]">{vibeData}</p>
                     </div>
                 </div>
             </div>
@@ -90,7 +146,7 @@ const ChatInterface = ({ vibeData }) => {
                     <span className="text-[10px] font-medium text-gray-600 bg-white/5 px-3 py-1 rounded-full">Today</span>
                 </div>
 
-                {/* Render Message Components */}
+                {/* Render Messages */}
                 {messages.map((msg) => (
                     <MessageBubble key={msg.id} message={msg} />
                 ))}
@@ -107,7 +163,7 @@ const ChatInterface = ({ vibeData }) => {
                     </div>
                 )}
 
-                {/* Invisible element to auto-scroll to */}
+                {/* Auto-scroll anchor */}
                 <div ref={chatEndRef} />
             </div>
 
@@ -121,12 +177,17 @@ const ChatInterface = ({ vibeData }) => {
                     <input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        className="flex-1 bg-transparent border-none text-white placeholder-gray-500 text-sm py-2.5 focus:ring-0 outline-none"
+                        disabled={isTyping}
+                        className="flex-1 bg-transparent border-none text-white placeholder-gray-500 text-sm py-2.5 focus:ring-0 outline-none disabled:opacity-50"
                         placeholder="Request a song or chat with AI..."
                         type="text"
                     />
 
-                    <button type="submit" className="size-10 rounded-full bg-primary hover:bg-green-400 text-background-dark flex items-center justify-center shadow-lg shadow-primary/20 transition-all hover:scale-105">
+                    <button
+                        type="submit"
+                        disabled={isTyping || !inputValue.trim()}
+                        className="size-10 rounded-full bg-primary hover:bg-green-400 text-background-dark flex items-center justify-center shadow-lg shadow-primary/20 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    >
                         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>send</span>
                     </button>
                 </div>
