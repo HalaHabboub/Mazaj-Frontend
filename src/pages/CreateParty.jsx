@@ -1,22 +1,52 @@
 // src/pages/CreateParty.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config/api';
 import './css/CreateParty.css';
 
 const CreateParty = () => {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
         vibe: ''
     });
 
-    const handleStart = () => {
-        // Validation (check if party name is provided)
+    // Function to create party via API
+    const createParty = async () => {
+        const response = await fetch(`${API_URL}/party`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: formData.name,
+                vibeDescription: formData.vibe,
+                hostId: 'user-123' // Hardcoded for now
+            }),
+        });
+        const data = await response.json();
+        return data;
+    };
+
+    const handleStart = async () => {
         if (!formData.name) return;
 
-        // Navigate to a mock party ID
-        navigate('/party/MZ-8821');
+        setIsLoading(true);
+        try {
+            const result = await createParty();
+            if (result.success) {
+                // Navigate to the REAL party ID from API
+                navigate(`/party/${result.party.id}`);
+            } else {
+                alert('Failed to create party');
+            }
+        } catch (error) {
+            console.error('Failed to create party:', error);
+            alert('Connection error');
+        }
+        setIsLoading(false);
     };
 
     return (
@@ -64,6 +94,7 @@ const CreateParty = () => {
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="block w-full rounded-full border border-zinc-700 bg-[#121214]/50 p-4 pl-12 text-white placeholder-zinc-600 focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 outline-none"
                                 placeholder="e.g., Friday Night Hype"
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -87,9 +118,8 @@ const CreateParty = () => {
                                 onChange={(e) => setFormData({ ...formData, vibe: e.target.value })}
                                 className="custom-scrollbar block w-full rounded-2xl border border-zinc-700 bg-[#121214]/50 p-4 text-white placeholder-zinc-600 focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 resize-none leading-relaxed outline-none"
                                 placeholder="Describe the mood... e.g., Upbeat 2000s Pop, no slow ballads, high energy dance hits only."
+                                disabled={isLoading}
                             ></textarea>
-
-
                         </div>
                     </div>
 
@@ -100,13 +130,22 @@ const CreateParty = () => {
                     <div className="pt-2">
                         <button
                             onClick={handleStart}
-                            className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary p-4 transition-all hover:bg-[#2bc466] hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(54,226,123,0.3)] hover:shadow-[0_0_30px_rgba(54,226,123,0.5)]"
+                            disabled={isLoading || !formData.name}
+                            className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary p-4 transition-all hover:bg-[#2bc466] hover:scale-[1.01] active:scale-[0.99] shadow-[0_0_20px_rgba(54,226,123,0.3)] hover:shadow-[0_0_30px_rgba(54,226,123,0.5)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         >
                             <div className="relative z-10 flex items-center gap-3 text-background-dark text-lg font-bold tracking-tight">
-                                <span className="material-symbols-outlined text-[24px]">play_circle</span>
-                                <span>Start Party</span>
+                                {isLoading ? (
+                                    <>
+                                        <span className="material-symbols-outlined text-[24px] animate-spin">sync</span>
+                                        <span>Creating Party...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="material-symbols-outlined text-[24px]">play_circle</span>
+                                        <span>Start Party</span>
+                                    </>
+                                )}
                             </div>
-                            {/* Shine effect */}
                             <div className="absolute inset-0 -translate-x-full group-hover:animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent z-0"></div>
                         </button>
 
