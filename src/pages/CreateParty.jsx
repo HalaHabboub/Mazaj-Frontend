@@ -5,6 +5,9 @@ import { API_URL } from '../config/api';
 import './css/CreateParty.css';
 
 const CreateParty = () => {
+    // get user
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +26,7 @@ const CreateParty = () => {
             body: JSON.stringify({
                 name: formData.name,
                 vibeDescription: formData.vibe,
-                hostId: 'user-123' // Hardcoded for now
+                hostId: user.id
             }),
         });
         const data = await response.json();

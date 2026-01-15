@@ -1,5 +1,7 @@
+// src/pages/Auth.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config/api';
 
 // Components
 import Input from '../components/ui/input';
@@ -11,32 +13,76 @@ import './css/Auth.css';
 const Auth = () => {
     const navigate = useNavigate();
 
-    // State to toggle between Login (true) and Signup (false)
     const [isLogin, setIsLogin] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-    // Form State
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
-        password: ''
+        password: '',
+        avatarUrl: ''
     });
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
     };
 
-    const handleSubmit = (e) => {
+    // Signup function
+    const signup = async () => {
+        const response = await fetch(`${API_URL}/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+                name: `${formData.firstName} ${formData.lastName}`.trim(),
+                avatarUrl: formData.avatarUrl || `https://i.pravatar.cc/150?u=${formData.email}`
+            }),
+        });
+        return await response.json();
+    };
+
+    // Login function
+    const login = async () => {
+        const response = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password
+            }),
+        });
+        return await response.json();
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form Submitted:", formData);
-        // TODO: Connect to Supabase Auth here later
-        navigate('/home'); // Temporary redirect for demo
-    };
+        setIsLoading(true);
+        setError('');
 
+        try {
+            const result = isLogin ? await login() : await signup();
+
+            if (result.success) {
+                localStorage.setItem('user', JSON.stringify(result.user));
+                navigate('/home');
+            } else {
+                setError(result.message || 'Something went wrong');
+            }
+        } catch (err) {
+            console.error('Auth error:', err);
+            setError('Connection error. Please try again.');
+        }
+
+        setIsLoading(false);
+    };
 
     return (
         <div className="auth-container">
-            {/* Background Blobs (Optional: reused from Landing for consistency) */}
+            {/* Background Blobs */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[20%] left-[10%] w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px] opacity-20"></div>
             </div>
@@ -53,26 +99,62 @@ const Auth = () => {
                     </p>
                 </div>
 
+                {/* Error Message */}
+                {error && (
+                    <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-4 text-sm">
+                        {error}
+                    </div>
+                )}
+
                 <form className="auth-form" onSubmit={handleSubmit}>
 
                     {/* SHOW THESE ONLY IF SIGNING UP */}
                     {!isLogin && (
-                        <div className="flex gap-4">
-                            <Input
-                                name="firstName"
-                                placeholder="First Name"
-                                value={formData.firstName}
-                                onChange={handleChange}
-                                required
-                            />
-                            <Input
-                                name="lastName"
-                                placeholder="Last Name"
-                                value={formData.lastName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+                        <>
+                            <div className="flex gap-4">
+                                <Input
+                                    name="firstName"
+                                    placeholder="First Name"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    required
+                                />
+                                <Input
+                                    name="lastName"
+                                    placeholder="Last Name"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    disabled={isLoading}
+                                    required
+                                />
+                            </div>
+
+                            {/* Avatar URL Input */}
+                            <div className="flex items-center gap-4">
+                                <div className="size-14 shrink-0 rounded-full overflow-hidden bg-white/10 border border-white/20">
+                                    <img
+                                        src={formData.avatarUrl || `https://i.pravatar.cc/150?u=${formData.email || 'default'}`}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => e.target.src = 'https://i.pravatar.cc/150?u=default'}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <Input
+                                        name="avatarUrl"
+                                        type="url"
+                                        placeholder="Profile photo URL (optional)"
+                                        value={formData.avatarUrl}
+                                        onChange={handleChange}
+                                        disabled={isLoading}
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1 pl-1">
+                                        Leave empty for auto-generated avatar
+                                    </p>
+                                </div>
+                            </div>
+                        </>
                     )}
 
                     <Input
@@ -82,6 +164,7 @@ const Auth = () => {
                         placeholder="name@example.com"
                         value={formData.email}
                         onChange={handleChange}
+                        disabled={isLoading}
                         required
                     />
 
@@ -92,11 +175,12 @@ const Auth = () => {
                         placeholder="••••••••"
                         value={formData.password}
                         onChange={handleChange}
+                        disabled={isLoading}
                         required
                     />
 
-                    <Button variant="primary" type="submit" className="w-full mt-2">
-                        {isLogin ? 'Sign In' : 'Sign Up'}
+                    <Button variant="primary" type="submit" className="w-full mt-2" disabled={isLoading}>
+                        {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
                     </Button>
                 </form>
 
@@ -104,7 +188,11 @@ const Auth = () => {
                     {isLogin ? "Don't have an account?" : "Already have an account?"}
                     <button
                         className="auth-link"
-                        onClick={() => setIsLogin(!isLogin)}
+                        onClick={() => {
+                            setIsLogin(!isLogin);
+                            setError('');
+                        }}
+                        disabled={isLoading}
                     >
                         {isLogin ? 'Sign Up' : 'Log In'}
                     </button>

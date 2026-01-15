@@ -4,10 +4,15 @@ import { API_URL } from '../../config/api';
 import MessageBubble from './messageBubble';
 
 const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
+    // Get current user
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
     const [inputValue, setInputValue] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [messages, setMessages] = useState([]);
     const chatEndRef = useRef(null);
+
+
 
     // Auto-scroll to bottom
     useEffect(() => {
@@ -61,7 +66,7 @@ const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
             },
             body: JSON.stringify({
                 partyId: partyId,
-                senderId: 'user-123', // Hardcoded for now
+                senderId: user.id || 'anonymous',
                 content: content
             }),
         });
@@ -81,7 +86,10 @@ const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
             id: Date.now(),
             type: 'user',
             text: userText,
-            user: { name: 'You', avatar: 'https://i.pravatar.cc/150?u=You' }
+            user: {
+                name: user.name || 'You',
+                avatar: user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`
+            }
         };
 
         setMessages(prev => [...prev, userMessage]);

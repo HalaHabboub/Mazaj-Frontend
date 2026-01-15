@@ -1,27 +1,29 @@
+// src/components/layout/navbar.jsx
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import '../css/Navbar.css'; // Importing your custom CSS
+import '../css/Navbar.css';
 
 const Navbar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const path = location.pathname;
 
-    // Mock User Data (Replace with real Auth later)
-    const userName = "Hala";
-    const participantCount = 12;
+    // Get real user from localStorage
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const userName = user?.name || 'Guest';
+    const userAvatar = user?.avatarUrl || `https://i.pravatar.cc/150?u=${user?.email || 'default'}`;
 
-    // HELPER: Decide what to render on the RIGHT side
+    // Logout function
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        navigate('/auth');
+    };
+
     const renderRightSide = () => {
-        // 1. PARTY MODE (If URL starts with /party/)
+        // 1. PARTY MODE
         if (path.startsWith('/party/')) {
             return (
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <button className="nav-btn nav-btn-primary">
-                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>group</span>
-                        Participants: {participantCount}
-                    </button>
-
                     <button onClick={() => navigate('/home')} className="nav-btn nav-btn-danger">
                         Exit Party
                     </button>
@@ -38,18 +40,20 @@ const Navbar = () => {
             );
         }
 
-        // 3. LOGGED IN MODE (Home, Profile, Create Party)
+        // 3. LOGGED IN MODE
         return (
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <span className="nav-text">Welcome, {userName}</span>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#36e27b' }}>
-                    {/* Avatar Placeholder */}
+                <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden' }}>
                     <img
-                        src={`https://ui-avatars.com/api/?name=${userName}&background=36e27b&color=fff`}
+                        src={userAvatar}
                         alt="Avatar"
-                        style={{ borderRadius: '50%', width: '100%' }}
+                        style={{ borderRadius: '50%', width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                 </div>
+                <button onClick={handleLogout} className="nav-btn nav-btn-danger" style={{ padding: '6px 12px', fontSize: '12px' }}>
+                    Logout
+                </button>
             </div>
         );
     };
@@ -57,13 +61,10 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                {/* LEFT SIDE: Always the Logo */}
                 <Link to={path === '/' ? '/' : '/home'} className="nav-logo">
                     <span className="material-symbols-outlined">graphic_eq</span>
                     Mazaj
                 </Link>
-
-                {/* RIGHT SIDE: Dynamic Content */}
                 {renderRightSide()}
             </div>
         </nav>
