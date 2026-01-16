@@ -8,7 +8,7 @@ import Input from '../components/ui/input';
 import Button from '../components/ui/button';
 
 // Styles
-import './css/Auth.css';
+import './css/auth.css';
 
 const Auth = () => {
     const navigate = useNavigate();

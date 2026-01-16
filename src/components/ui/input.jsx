@@ -1,6 +1,6 @@
 // src/components/ui/Input.jsx
 import React from 'react';
-import '../css/Input.css';
+import '../css/input.css';
 
 const Input = ({ label, type = "text", placeholder, value, onChange, name, required = false }) => {
     return (

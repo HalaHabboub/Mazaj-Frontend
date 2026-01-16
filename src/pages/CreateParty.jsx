@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
-import './css/CreateParty.css';
+import './css/createParty.css';
 
 const CreateParty = () => {
     const navigate = useNavigate();

@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import HostCard from '../components/party/hostCard';
 import JoinCard from '../components/party/joinCard';
 import PartyListItem from '../components/party/partyListItem';
-import './css/Dashboard.css';
+import './css/dashboard.css';
 
 const Dashboard = () => {
   const [parties, setParties] = useState([]);
