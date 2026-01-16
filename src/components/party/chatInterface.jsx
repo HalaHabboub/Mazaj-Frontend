@@ -29,18 +29,21 @@ const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
 
                 if (data.success && data.messages.length > messages.length) {
                     // New messages arrived!
-                    const formattedMessages = data.messages.map(msg => ({
-                        id: msg.id,
-                        type: msg.role === 'USER' ? 'user' :
-                            msg.type === 'AI_ACCEPT' ? 'ai-accept' :
-                                msg.type === 'AI_DENY' ? 'ai-deny' : 'ai',
-                        text: msg.content,
-                        user: msg.role === 'USER' ? {
-                            name: msg.senderId === user.id ? 'You' : (msg.senderName || 'Guest'),
-                            avatar: msg.senderAvatar || `https://i.pravatar.cc/150?u=${msg.senderId}`,
-                            isMe: msg.senderId === user.id
-                        } : null
-                    }));
+                    const formattedMessages = data.messages.map(msg => {
+                        const isCurrentUser = String(msg.senderId) === String(user.id);
+                        return {
+                            id: msg.id,
+                            type: msg.role === 'USER' ? 'user' :
+                                msg.type === 'AI_ACCEPT' ? 'ai-accept' :
+                                    msg.type === 'AI_DENY' ? 'ai-deny' : 'ai',
+                            text: msg.content,
+                            user: msg.role === 'USER' ? {
+                                name: isCurrentUser ? 'You' : (msg.senderName || 'Guest'),
+                                avatar: msg.senderAvatar || `https://i.pravatar.cc/150?u=${msg.senderId}`,
+                                isMe: isCurrentUser
+                            } : null
+                        };
+                    });
                     setMessages(formattedMessages);
 
                     // Also refresh queue in case songs were added
@@ -85,7 +88,8 @@ const ChatInterface = ({ partyId, vibeData, onQueueUpdate }) => {
             text: userText,
             user: {
                 name: user.name || 'You',
-                avatar: user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`
+                avatar: user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`,
+                isMe: true
             }
         };
 
