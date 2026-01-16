@@ -2,6 +2,7 @@
 // src/pages/Dashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config/api';
+import { useNavigate } from 'react-router-dom';
 
 import HostCard from '../components/party/hostCard';
 import JoinCard from '../components/party/joinCard';
@@ -11,8 +12,16 @@ import './css/Dashboard.css';
 const Dashboard = () => {
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user?.id) {
+      navigate('/auth');
+    }
+  }, []);
 
   const fetchParties = async () => {
     if (!user.id) {
@@ -112,7 +121,7 @@ const Dashboard = () => {
                   host="You"
                   time={timeAgo(party.createdAt)}
                   type="music"
-                  attendees={[user.avatarUrl || `https://i.pravatar.cc/150?u=${user.email}`]}
+                  attendees={party.members?.map(m => m.avatarUrl || `https://i.pravatar.cc/150?u=${m.email}`) || []}
                   canDelete={true}
                   onDelete={deleteParty}
                 />

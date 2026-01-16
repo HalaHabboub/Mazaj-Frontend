@@ -1,14 +1,20 @@
 // src/pages/CreateParty.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../config/api';
 import './css/CreateParty.css';
 
 const CreateParty = () => {
-    // get user
+    const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    const navigate = useNavigate();
+    // Redirect if not logged in
+    useEffect(() => {
+        if (!user?.id) {
+            navigate('/auth');
+        }
+    }, []);
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({

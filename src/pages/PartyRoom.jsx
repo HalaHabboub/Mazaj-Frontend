@@ -3,14 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { API_URL } from '../config/api';
+import { useNavigate } from 'react-router-dom';
 
 import NowPlaying from '../components/party/nowPlaying';
 import QueueList from '../components/party/queueList';
 import ChatInterface from '../components/party/chatInterface';
 
 const PartyRoom = () => {
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const { id } = useParams();
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user?.id) {
+      navigate('/auth');
+    }
+  }, []);
 
   const [party, setParty] = useState(null);
   const [queue, setQueue] = useState([]);

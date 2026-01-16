@@ -61,7 +61,7 @@ const Navbar = () => {
     return (
         <nav className="navbar">
             <div className="navbar-container">
-                <Link to={path === '/' ? '/' : '/home'} className="nav-logo">
+                <Link to={user?.id ? '/home' : '/'} className="nav-logo">
                     <span className="material-symbols-outlined">graphic_eq</span>
                     Mazaj
                 </Link>
